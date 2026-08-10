@@ -1,54 +1,46 @@
-<!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.svg"><title>薬剤配合計算</title>
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111"><link rel="manifest" href="manifest.json"><title>薬剤配合計算</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f3f3;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding:18px 14px 90px}
-h1{font-size:24px;margin:4px 0 3px}.sub{color:#777;font-size:12px;margin-bottom:16px}
-.card{background:#fff;border-radius:16px;padding:15px;margin:12px 0;box-shadow:0 2px 12px #0001}.row{display:grid;grid-template-columns:1fr 105px 42px;gap:8px;margin:8px 0}
-select,input{width:100%;padding:11px;border:1px solid #d5d5d5;border-radius:10px;background:#fff;font-size:16px}button{border:0;border-radius:10px;padding:11px 13px;font-size:14px;font-weight:600;background:#111;color:#fff}button.light{background:#eee;color:#222}button.danger{background:#eee;color:#b00020}.actions{display:flex;gap:8px;flex-wrap:wrap}
-.results{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{background:#f7f7f7;border-radius:12px;padding:12px}.metric small{color:#777}.metric strong{display:block;font-size:22px;margin-top:3px}
-.tabs{display:flex;gap:6px;margin:10px 0}.tabs button{flex:1}.tabs .active{background:#555}
-label{display:block;font-size:12px;color:#666;margin:8px 0 4px}.saved{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
-.small{font-size:12px;color:#777;line-height:1.6}.hidden{display:none}.badge{font-size:11px;color:#777}
-@media(min-width:600px){.results{grid-template-columns:repeat(4,1fr)}}
-</style></head>
-<body><main class="app">
-<h1>薬剤配合計算</h1><div class="sub">チオ換算・アルカリ寄与を自動計算 / データはこの端末に保存</div>
+*{box-sizing:border-box}body{margin:0;background:#f3f3f3;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding:18px 14px 90px}h1{font-size:24px;margin:4px 0}.sub{font-size:12px;color:#777;margin-bottom:15px}.card{background:#fff;border-radius:16px;padding:15px;margin:12px 0;box-shadow:0 2px 12px #0001}.row{display:grid;grid-template-columns:1fr 105px 42px;gap:8px;margin:8px 0}select,input{width:100%;padding:11px;border:1px solid #d5d5d5;border-radius:10px;background:#fff;font-size:16px}button{border:0;border-radius:10px;padding:11px 13px;background:#111;color:#fff;font-size:14px;font-weight:600}.light{background:#eee;color:#222}.danger{background:#eee;color:#b00020}.actions{display:flex;gap:8px;flex-wrap:wrap}.results{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{background:#f7f7f7;border-radius:12px;padding:12px}.metric small{color:#777}.metric strong{display:block;font-size:21px;margin-top:3px}.tabs{display:flex;gap:6px;margin:10px 0}.tabs button{flex:1}.tabs .active{background:#555}.small{font-size:12px;color:#777;line-height:1.6}.amount{grid-column:1/-1}.hidden{display:none}.saved{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #eee}.saved button{padding:8px}.badge{font-size:11px;color:#777}@media(min-width:600px){.results{grid-template-columns:repeat(4,1fr)}}
+</style></head><body><main class="app">
+<h1>💇 薬剤配合計算</h1><div class="sub">100g固定 / 「20%」と「1:1」を混ぜて入力できます</div>
 <div class="tabs"><button id="tabCalc" class="active" onclick="show('calc')">配合計算</button><button id="tabDrugs" onclick="show('drugs')">薬剤登録</button><button id="tabSaved" onclick="show('saved')">保存配合</button></div>
 
-<section id="calc">
-<div class="card"><div id="rows"></div><div class="actions"><button onclick="addRow()">＋ 薬剤追加</button><button class="light" onclick="preset()">今回の配合</button><button class="light" onclick="clearRows()">クリア</button></div></div>
-<div class="card"><div class="results">
-<div class="metric"><small>総量</small><strong id="total">0.0 g</strong></div><div class="metric"><small>チオ換算</small><strong id="thio">0.00 %</strong></div><div class="metric"><small>アルカリ寄与</small><strong id="alk">0.00</strong></div><div class="metric"><small>pH参考</small><strong id="ph">—</strong></div>
-</div><p class="small">※チオ換算・アルカリは配合量による加重平均。混合後pHは薬剤の緩衝能などで変わるため、表示値は参考値です。実測を優先してください。</p></div>
-<div class="card"><b>配合を保存</b><label>名前</label><input id="saveName" placeholder="例：弱め酸性矯正">
-<button style="margin-top:8px" onclick="saveMix()">この配合を保存</button></div>
-</section>
+<section id="calc"><div class="card"><b>100g固定・入力</b>
+<p class="small">例：T「1」＋J7「1」＋SH「20%」＋SPI22「5%」→ 残り75gをT:J7=1:1で配分。</p>
+<div id="rows"></div><div class="actions"><button onclick="addRow()">＋ 薬剤追加</button><button class="light" onclick="preset()">今回の配合</button><button class="light" onclick="clearRows()">クリア</button></div></div>
+<div class="card"><div class="results"><div class="metric"><small>総量</small><strong id="total">100.00 g</strong></div><div class="metric"><small>チオ換算</small><strong id="thio">0.00 %</strong></div><div class="metric"><small>アルカリ寄与</small><strong id="alk">0.00</strong></div><div class="metric"><small>pH参考</small><strong id="ph">—</strong></div></div>
+<p id="status" class="small"></p><p class="small">※％指定は100g中の実量。％なしは比率。混合後pHは理論的な参考値で、実測を優先してください。</p></div>
+<div class="card"><b>配合を保存</b><input id="saveName" placeholder="例：弱め酸性矯正" style="margin-top:8px"><button style="margin-top:8px" onclick="saveMix()">この配合を保存</button></div></section>
 
-<section id="drugs" class="hidden"><div class="card"><b>薬剤を登録・編集</b><p class="small">チオ換算%、アルカリ、pHを入力。あとから変更できます。</p><div id="drugEditor"></div>
-<button onclick="newDrug()">＋ 新しい薬剤</button></div></section>
-
+<section id="drugs" class="hidden"><div class="card"><b>薬剤登録・編集</b><p class="small">チオ換算%、アルカリ、pHを登録できます。</p><div id="drugEditor"></div><button onclick="newDrug()">＋ 新しい薬剤</button></div></section>
 <section id="saved" class="hidden"><div class="card"><b>保存した配合</b><div id="savedList"></div></div></section>
 </main>
 <script>
-const KEY='yakuzai_calc_v2';
-let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
- drugs:{
-  "T":{thio:7,alk:0,ph:7},"A":{thio:11,alk:0,ph:5.9},"SH":{thio:11,alk:7,ph:9.2},"J7":{thio:5.6,alk:0,ph:7},
-  "WECOBASE SPI22":{thio:17.1,alk:0,ph:4},"パイモア R33":{thio:33,alk:0,ph:4},"WECOBASE GMT80":{thio:44,alk:0,ph:4},"チオ50":{thio:50,alk:0,ph:null}
- },mixes:[]};
-let rows=[]; function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
+const KEY='yakuzai_calc_percent_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{drugs:{
+"T":{thio:7,alk:0,ph:7},"A":{thio:11,alk:0,ph:5.9},"SH":{thio:11,alk:7,ph:9.2},"J7":{thio:5.6,alk:0,ph:7},
+"WECOBASE SPI22":{thio:17.1,alk:0,ph:4},"パイモア R33":{thio:33,alk:0,ph:4},"WECOBASE GMT80":{thio:44,alk:0,ph:4},"チオ50":{thio:50,alk:0,ph:null}},mixes:[]};
+let rows=[];
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function opts(sel){return Object.keys(data.drugs).map(n=>`<option ${n===sel?'selected':''}>${n}</option>`).join('')}
-function addRow(name=Object.keys(data.drugs)[0],g=0){rows.push({name,g});render()}
-function render(){const el=document.getElementById('rows');el.innerHTML='';rows.forEach((r,i)=>{const d=document.createElement('div');d.className='row';d.innerHTML=`<select>${opts(r.name)}</select><input type="number" min="0" step="0.1" value="${r.g}"><button class="danger">×</button>`;d.querySelector('select').onchange=e=>{r.name=e.target.value;calc()};d.querySelector('input').oninput=e=>{r.g=+e.target.value||0;calc()};d.querySelector('button').onclick=()=>{rows.splice(i,1);render()};el.appendChild(d)});calc()}
-function calc(){let t=0,ts=0,as=0,ps=0,pw=0;rows.forEach(r=>{let d=data.drugs[r.name],g=+r.g||0;t+=g;ts+=g*d.thio;as+=g*d.alk;if(d.ph!=null&&g){ps+=g*d.ph;pw+=g}});document.getElementById('total').textContent=t.toFixed(1)+' g';document.getElementById('thio').textContent=(t?ts/t:0).toFixed(2)+' %';document.getElementById('alk').textContent=(t?as/t:0).toFixed(2);document.getElementById('ph').textContent=pw?(ps/pw).toFixed(2):'—'}
-function preset(){rows=[{name:'T',g:37.5},{name:'J7',g:37.5},{name:'SH',g:20},{name:'WECOBASE SPI22',g:5}];render()}
+function addRow(name=Object.keys(data.drugs)[0],input=''){rows.push({name,input});render()}
+function parse(v){v=String(v).trim();if(v.endsWith('%')){let n=parseFloat(v.slice(0,-1));return{t:'p',v:isNaN(n)?0:n}}let n=parseFloat(v);return{t:'r',v:isNaN(n)?0:n}}
+function calc(){
+ let fixed=0,rs=0;rows.forEach(r=>{let x=parse(r.input);if(x.t==='p')fixed+=Math.max(0,x.v);else rs+=Math.max(0,x.v)});
+ let rem=100-fixed,total=0,ts=0,as=0,ps=0,pw=0;
+ document.getElementById('status').textContent=fixed>100?'⚠ ％指定の合計が100%を超えています。':`％指定 ${fixed.toFixed(1)}% / 比率配分の残り ${Math.max(0,rem).toFixed(1)}g`;
+ document.querySelectorAll('#rows .row').forEach((el,i)=>{let r=rows[i],x=parse(r.input),g=x.t==='p'?Math.max(0,x.v):(rs?Math.max(0,rem)*Math.max(0,x.v)/rs:0);el.querySelector('.amount').textContent='実量：'+g.toFixed(2)+' g';let d=data.drugs[r.name];total+=g;ts+=g*d.thio;as+=g*d.alk;if(d.ph!=null&&g){ps+=g*d.ph;pw+=g}});
+ document.getElementById('total').textContent=total.toFixed(2)+' g';document.getElementById('thio').textContent=(total?ts/total:0).toFixed(2)+' %';document.getElementById('alk').textContent=(total?as/total:0).toFixed(2);document.getElementById('ph').textContent=pw?(ps/pw).toFixed(2):'—';
+}
+function render(){let e=document.getElementById('rows');e.innerHTML='';rows.forEach((r,i)=>{let d=document.createElement('div');d.className='row';d.innerHTML=`<select>${opts(r.name)}</select><input type="text" inputmode="decimal" placeholder="20% / 1" value="${r.input}"><button class="danger">×</button><div class="small amount">実量：—</div>`;d.querySelector('select').onchange=e=>{r.name=e.target.value;calc()};d.querySelector('input').oninput=e=>{r.input=e.target.value;calc()};d.querySelector('button').onclick=()=>{rows.splice(i,1);render()};e.appendChild(d)});calc()}
+function preset(){rows=[{name:'T',input:'1'},{name:'J7',input:'1'},{name:'SH',input:'20%'},{name:'WECOBASE SPI22',input:'5%'}];render()}
 function clearRows(){rows=[];render()}
 function show(s){['calc','drugs','saved'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==s));['Calc','Drugs','Saved'].forEach(x=>document.getElementById('tab'+x).classList.toggle('active',x.toLowerCase()===s));if(s==='drugs')renderDrugs();if(s==='saved')renderSaved()}
-function renderDrugs(){let e=document.getElementById('drugEditor');e.innerHTML='';Object.entries(data.drugs).forEach(([n,d])=>{let box=document.createElement('div');box.className='card';box.innerHTML=`<label>薬剤名</label><input class="n" value="${n}"><label>チオ換算 %</label><input class="t" type="number" step="0.1" value="${d.thio}"><label>アルカリ</label><input class="a" type="number" step="0.1" value="${d.alk}"><label>pH</label><input class="p" type="number" step="0.1" value="${d.ph??''}" placeholder="不明なら空欄"><button style="margin-top:8px">保存</button>`;box.querySelector('button').onclick=()=>{let nn=box.querySelector('.n').value.trim();if(!nn)return;let old=data.drugs[n];delete data.drugs[n];data.drugs[nn]={thio:+box.querySelector('.t').value||0,alk:+box.querySelector('.a').value||0,ph:box.querySelector('.p').value===''?null:+box.querySelector('.p').value};persist();renderDrugs();render()};e.appendChild(box)})}
-function newDrug(){let n=prompt('薬剤名');if(!n)return;data.drugs[n]={thio:0,alk:0,ph:null};persist();renderDrugs()}
-function saveMix(){let name=document.getElementById('saveName').value.trim()||'無題の配合';data.mixes.unshift({id:Date.now(),name,rows:JSON.parse(JSON.stringify(rows))});persist();document.getElementById('saveName').value='';renderSaved();alert('保存しました')}
-function renderSaved(){let e=document.getElementById('savedList');e.innerHTML=data.mixes.length?'':'<p class="small">まだありません。</p>';data.mixes.forEach(m=>{let d=document.createElement('div');d.className='saved';d.innerHTML=`<span><b>${m.name}</b><br><span class="badge">${m.rows.map(x=>x.name+' '+x.g+'g').join(' / ')}</span></span><span><button class="light">呼出</button> <button class="danger">削除</button></span>`;d.querySelectorAll('button')[0].onclick=()=>{rows=JSON.parse(JSON.stringify(m.rows));show('calc');render()};d.querySelectorAll('button')[1].onclick=()=>{data.mixes=data.mixes.filter(x=>x.id!==m.id);persist();renderSaved()};e.appendChild(d)})}
+function saveMix(){let n=document.getElementById('saveName').value.trim()||'無題の配合';data.mixes.unshift({id:Date.now(),name:n,rows:JSON.parse(JSON.stringify(rows))});save();document.getElementById('saveName').value='';renderSaved();alert('保存しました')}
+function renderSaved(){let e=document.getElementById('savedList');e.innerHTML=data.mixes.length?'':'<p class="small">まだありません。</p>';data.mixes.forEach(m=>{let d=document.createElement('div');d.className='saved';d.innerHTML=`<span><b>${m.name}</b><br><span class="badge">${m.rows.map(x=>x.name+' '+x.input).join(' / ')}</span></span><span><button class="light">呼出</button> <button class="danger">削除</button></span>`;d.querySelectorAll('button')[0].onclick=()=>{rows=JSON.parse(JSON.stringify(m.rows));show('calc');render()};d.querySelectorAll('button')[1].onclick=()=>{data.mixes=data.mixes.filter(x=>x.id!==m.id);save();renderSaved()};e.appendChild(d)})}
+function renderDrugs(){let e=document.getElementById('drugEditor');e.innerHTML='';Object.entries(data.drugs).forEach(([n,d])=>{let b=document.createElement('div');b.className='card';b.innerHTML=`<input class="n" value="${n}"><label>チオ換算 %</label><input class="t" type="number" step=".1" value="${d.thio}"><label>アルカリ</label><input class="a" type="number" step=".1" value="${d.alk}"><label>pH</label><input class="p" type="number" step=".1" value="${d.ph??''}" placeholder="不明"><button style="margin-top:8px">保存</button>`;b.querySelector('button').onclick=()=>{let nn=b.querySelector('.n').value.trim();if(!nn)return;delete data.drugs[n];data.drugs[nn]={thio:+b.querySelector('.t').value||0,alk:+b.querySelector('.a').value||0,ph:b.querySelector('.p').value===''?null:+b.querySelector('.p').value};save();renderDrugs();render()};e.appendChild(b)})}
+function newDrug(){let n=prompt('薬剤名');if(n){data.drugs[n]={thio:0,alk:0,ph:null};save();renderDrugs()}}
 preset();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>
